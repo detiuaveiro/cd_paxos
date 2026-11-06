@@ -1,0 +1,36 @@
+name: Check assignment rules
+on: [push, workflow_dispatch]
+permissions:
+  contents: read
+
+jobs:
+  nmec:
+    name: Check NMEC.txt
+    runs-on: self-hosted
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v7
+      - name: Check student identifiers
+        run: |
+          test -f NMEC.txt
+          grep -Eq '^[0-9]{5}[[:space:]]*-[[:space:]]*[0-9]{5}[[:space:]]*$' NMEC.txt
+
+  moss:
+    name: Submit code for plagiarism checking
+    runs-on: self-hosted
+    timeout-minutes: 5
+    env:
+      MOSS_BASE_URL: https://moss.av.it.pt/guiao4
+      COMMITTER: ${{ github.actor }}
+    steps:
+      - uses: actions/checkout@v7
+      - name: Create submission archive
+        run: |
+          test -f NMEC.txt
+          rm -f submission.zip
+          zip submission.zip ./*.py NMEC.txt
+      - name: Upload submission
+        run: |
+          curl --fail --show-error --silent --max-time 60 \
+            -F "committer=$COMMITTER" -F "zip=@submission.zip" \
+            "${MOSS_BASE_URL%/}/upload"

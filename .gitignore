@@ -8,3 +8,11 @@ htmlcov/
 htmlcov/
 coverage.xml
 *.log
+
+.ci-venv/
+
+pytest-results.xml
+
+submission.zip
+
+tests/md5sum.txt

@@ -1,0 +1,32 @@
+name: Evaluation
+on: [push, workflow_dispatch]
+permissions:
+  contents: read
+
+jobs:
+  unit_tests:
+    name: Tests and type checking
+    runs-on: self-hosted
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.14"
+      - name: Install dependencies
+        run: |
+          python -m venv .ci-venv
+          .ci-venv/bin/python -m pip install -r requirements-dev.txt
+      - name: Run deterministic and live UDP tests
+        run: .ci-venv/bin/python -m pytest --run-udp --junitxml=pytest-results.xml
+      - name: Check types
+        if: ${{ !cancelled() }}
+        run: .ci-venv/bin/python -m mypy
+      - name: Upload test results
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: paxos-test-results
+          path: pytest-results.xml
+          if-no-files-found: ignore
+          retention-days: 7

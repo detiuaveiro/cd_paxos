@@ -1,0 +1,22 @@
+name: Check tests are up to date
+on:
+  schedule:
+    - cron: "0 0 * * *"
+  workflow_dispatch:
+permissions:
+  contents: read
+
+jobs:
+  compare_prof:
+    runs-on: self-hosted
+    timeout-minutes: 5
+    env:
+      MOSS_BASE_URL: https://moss.av.it.pt/guiao4
+    steps:
+      - uses: actions/checkout@v7
+      - name: Compare test checksums
+        working-directory: tests
+        run: |
+          curl --fail --show-error --silent --max-time 60 \
+            -o md5sum.txt "${MOSS_BASE_URL%/}/md5sum"
+          md5sum --strict -c md5sum.txt

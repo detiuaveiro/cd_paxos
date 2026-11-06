@@ -213,3 +213,19 @@ python -m pytest --run-udp
 This is a classroom implementation with fixed membership, in-memory state and
 trusted messages. It decides a single value, without a replicated log, durable
 storage, membership changes or Byzantine fault tolerance.
+
+## GitHub Actions
+
+Workflows use the same `self-hosted` runner model as the Chord assignment.
+Evaluation installs development dependencies in `.ci-venv`, runs the full test
+suite (including live UDP checks), checks types and saves the test report.
+Tests manage their own agents and hub; no background demo is started by CI.
+The student skeleton is expected to fail evaluation until the TODOs are complete.
+
+Assignment checks validate `NMEC.txt` (two five-digit student numbers separated
+by a hyphen) and submit Python source to `https://moss.av.it.pt/guiao4/upload`.
+A daily/manual workflow compares test checksums with the same service's
+`/md5sum` endpoint. The solved repository additionally publishes reference
+checksums on pushes to its default branch; it permits an absent `NMEC.txt`.
+The runner needs Python 3.14 support, loopback UDP, `curl`, `zip` and `md5sum`,
+and access to the MOSS service. Workflows become active when pushed to GitHub.
